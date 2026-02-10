@@ -4,108 +4,122 @@ const tareaEntrada = document.getElementById("tareaEntrada");
 const botonAgregar = document.getElementById("botonAgregar");
 const contenedorTareas = document.getElementById("contenedorTareas");
 const mensaje = document.getElementById("mensaje");
-
-/* Función para crear el elemento tarea (función nodo) */
-
-function crearElementoTarea () {
-    // Crear los elementos html de la tarea 
-    const tareaContenedor = document.createElement("div");
-    const tareaTexto = document.createElement("p");
-    const iconosContenedor = document.createElement("div");
-    const iconoCompletada = document.createElement("i");
-    const iconoEliminar = document.createElement("i");
-
-    // Creamos la estructura de la tarea
-    iconosContenedor.append(iconoCompletada, iconoEliminar);
-    tareaContenedor.append(tareaTexto, iconosContenedor);
-
-    // Agregamos las clases a los elementos de la tarea
-    tareaContenedor.classList.add("tarea");
-    tareaTexto.classList.add("tarea-texto");
-    iconosContenedor.classList.add("tarea-iconos");
-    iconoCompletada.classList.add("bi", "bi-check-circle");
-    iconoEliminar.classList.add("bi", "bi-trash3");
-
-    tareaTexto.innerText = tareaEntrada.value;
-
-    //Escuchador de los iconos
-    iconoCompletada.addEventListener("click", (e) => {
-        /* Codigo que se ejecuta */
-        const tareaElemento = e.target.parentNode.parentNode
-        const esCompletada = tareaElemento.contains("tarea-completada");
-
-        tareaElemento.classList.toggle("tarea-completada");
-
-        if(esCompletada) {
-            e.target.classList.remove("bi-dash-circle");
-            e.target.classList.add("bi-check-circle");
-        } else{
-            e.target.classList.remove("bi-check-circle");
-            e.target.classList.add("bi-dash-circle");
-        }
-    })
-
-    iconoEliminar.addEventListener ("click", (e) => {
-        /* Codigo que se ejecuta */
-    })
+const contadorTotales = document.getElementById("contadorTotales");
+const contenedorTerminadas =document.getElementById("contenedorTerminadas");
 
 
 
-    return tareaContenedor;
+/* Función para crear elemento tarea (Función creadora del nodo Tarea) */
+function crearElementoTarea() {
+
+  // Crear los elementos html de la tarea
+  const tareaContenedor = document.createElement("div");
+  const tareaTexto = document.createElement("p");
+  const iconosContenedor = document.createElement("div");
+  const iconoCompletada = document.createElement("i");
+  const iconoEliminar = document.createElement("i");
+
+  // Creamos la estructura de la tarea
+  iconosContenedor.append(iconoCompletada, iconoEliminar);
+  tareaContenedor.append(tareaTexto, iconosContenedor);
+
+  // Agregamos las clases a los elementos de la tarea
+  tareaContenedor.classList.add("tarea");
+  tareaTexto.classList.add("tarea-texto");
+  iconosContenedor.classList.add("tarea-iconos");
+  iconoCompletada.classList.add("bi", "bi-check-circle");
+  iconoEliminar.classList.add("bi", "bi-trash2");
+
+  // Agregamos el texto del usuario
+  tareaTexto.innerText = tareaEntrada.value;
+
+  // Escuchadores de los iconos
+  iconoCompletada.addEventListener("click", (e) => {
+    const tareaElemento = e.target.parentNode.parentNode;
+    const esCompletada = tareaElemento.classList.contains("tarea-completada");
+
+    tareaElemento.classList.toggle("tarea-completada");
+
+    if (esCompletada) {
+      e.target.classList.remove("bi-dash-circle");
+      e.target.classList.add("bi-check-circle");
+    } else {
+      e.target.classList.remove("bi-check-circle");
+      e.target.classList.add("bi-dash-circle");
+    }
+
+    //Actualizar los contadores
+    actualizarContadores();
+  });
+
+  iconoEliminar.addEventListener("click", (e) => {
+    const tareaElemento = e.target.parentNode.parentNode;
+    tareaElemento.remove();
+
+    //Actualizar los contadores
+    actualizarContadores();
+  });
+
+  // Retornamos la estructura de la tarea
+  return tareaContenedor;
 }
 
-/* Escuchador */
+/* Funcion Actualizar contenedores */
+
+function actualizarContadores () {
+  const tareasTotales = document.querySelectorAll(".tarea");
+  const tareasCompletadas = document.querySelectorAll(".tarea-completada");
+
+  contadorTotales.textContent = tareasTotales.length;
+  contenedorTerminadas.textContent = tareasCompletadas.length;
+}
+
+
+
+
+/* Escuchador Boton*/
 botonAgregar.addEventListener("click", agregarTarea);
 
-/* Función agregar el elemento tarea */
+/* Funcion Agregar el elemento Tarea */
+function agregarTarea() {
 
-function agregarTarea(){
+  const texto = tareaEntrada.value.trim();
 
-    //Generar la constante para evaluar si hay texto o no
-    const texto = tareaEntrada.value.trim(); 
-    
-    //Evaluar la constante de texto
-    if(texto){
-        // Traemos el elemento retornado por la función crearElementoTarea
-        const elementoTarea = crearElementoTarea();
-        contenedorTareas.append(elementoTarea);
-    
-        //Reiniciar valor del input
-        tareaEntrada.value="";
-     
-       //Mostrar el mensaje de tarea creada satisfactoriamente
-       mensaje.textContent = "¡Tarea creada satisfactoriamente! 🤗"
-        
-    } else{
-        //Ejecutas esto otro 
-        mensaje.textContent = "¡No escribiste nada! 🥵";
-    }
+  if (texto) {
 
+    const elementoTarea = crearElementoTarea();
+    contenedorTareas.append(elementoTarea);
 
+    tareaEntrada.value = "";
+
+    //Moatrar el mensaje de tarea creada satisfactoriamente
+    mensaje.textContent = "¡Tarea creada satisfactoriamente! 🤗";
+
+    // actualizamos los contadores
+    actualizarContadores();
+
+  } else {
+
+    mensaje.textContent = "¡No escribiste nada! 🥵";
+  }
 }
 
-/* Hacemos que al presionar la tecla enter en el input se agregue la tarea */
+/* Hacemos que al presionar la tecla Enter en el Input se agregue la tarea */
 
 document.addEventListener("keydown", (e) => {
-    //Evaluar la tecla presionada 
-    if(e.key == "Enter") {
-        //Esto ocurre
-        agregarTarea();
-    }
+  if (e.key == "Enter") {
+    agregarTarea();
+  }
 });
 
-/* Mostrar un mensaje al escribir */
+/* Mostrar el mensaje al escribir */
 
 tareaEntrada.addEventListener("input", () => {
-    //Evaluamos si el valor del input esta vacio
-    if ( tareaEntrada.value.trim() === ""){
-        console.log("input vacio");
-  //Mostrar el mensaje de tarea creada satisfactoriamente
-       mensaje.textContent = "¡Escribe tu proxima tarea! 😎"
-        
-    } else{
-        //Ejecutas esto otro 
-        mensaje.textContent = "¡Al finalizar presiona enter! 😼";
-    }
 
-})
+  if (tareaEntrada.value.trim() === "") {
+    mensaje.textContent = "¡Escribe tu proxima tarea! 😎";
+  } else {
+    mensaje.textContent = "¡Al finalizar presiona Enter! 😼";
+  }
+});
+
